@@ -51,30 +51,6 @@ namespace TailSpin.SpaceGame.Web
         /// <param name="orderDescendingPredicate">Predicate that specifies how to sort the results in descending order.</param>
         /// <param name="page">The 1-based page of results to return.</param>
         /// <param name="pageSize">The number of items on a page.</param>
-        public Task<IEnumerable<T>> GetItemsAsync(
-            Expression<Func<T, bool>> queryPredicate,
-            Expression<Func<T, int>> orderDescendingPredicate,
-            int page = 1, int pageSize = 10
-        )
-        {
-            var result = _items.AsQueryable()
-                .Where(queryPredicate) // filter
-                .OrderByDescending(orderDescendingPredicate) // sort
-                .Skip(page * pageSize) // find page
-                .Take(pageSize - 1) // take items
-                .AsEnumerable(); // make enumeratable
-
-            return Task<IEnumerable<T>>.FromResult(result);
-        }
-
-        /// <summary>
-        /// Retrieves the number of items that match the given query predicate.
-        /// </summary>
-        /// <returns>
-        /// A task that represents the asynchronous operation.
-        /// The task result contains the number of items that match the query predicate.
-        /// </returns>
-        /// <param name="queryPredicate">Predicate that specifies which items to select.</param>
 public Task<IEnumerable<T>> GetItemsAsync(
     Expression<Func<T, bool>> queryPredicate,
     Expression<Func<T, int>> orderDescendingPredicate,
@@ -90,5 +66,22 @@ public Task<IEnumerable<T>> GetItemsAsync(
 
     return Task<IEnumerable<T>>.FromResult(result);
 }
+
+        /// <summary>
+        /// Retrieves the number of items that match the given query predicate.
+        /// </summary>
+        /// <returns>
+        /// A task that represents the asynchronous operation.
+        /// The task result contains the number of items that match the query predicate.
+        /// </returns>
+        /// <param name="queryPredicate">Predicate that specifies which items to select.</param>
+        public Task<int> CountItemsAsync(Expression<Func<T, bool>> queryPredicate)
+        {
+            var count = _items.AsQueryable()
+                .Where(queryPredicate) // filter
+                .Count(); // count
+
+            return Task<int>.FromResult(count);
+        }
     }
 }
