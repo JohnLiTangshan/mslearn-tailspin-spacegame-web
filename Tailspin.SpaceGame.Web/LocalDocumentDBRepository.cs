@@ -75,13 +75,20 @@ namespace TailSpin.SpaceGame.Web
         /// The task result contains the number of items that match the query predicate.
         /// </returns>
         /// <param name="queryPredicate">Predicate that specifies which items to select.</param>
-        public Task<int> CountItemsAsync(Expression<Func<T, bool>> queryPredicate)
-        {
-            var count = _items.AsQueryable()
-                .Where(queryPredicate) // filter
-                .Count(); // count
+public Task<IEnumerable<T>> GetItemsAsync(
+    Expression<Func<T, bool>> queryPredicate,
+    Expression<Func<T, int>> orderDescendingPredicate,
+    int page = 1, int pageSize = 10
+)
+{
+    var result = _items.AsQueryable()
+        .Where(queryPredicate) // filter
+        .OrderByDescending(orderDescendingPredicate) // sort
+        .Skip(page * pageSize) // find page
+        .Take(pageSize) // take items
+        .AsEnumerable(); // make enumeratable
 
-            return Task<int>.FromResult(count);
-        }
+    return Task<IEnumerable<T>>.FromResult(result);
+}
     }
 }
